@@ -40,9 +40,16 @@ def main():
 
     utm, mv = args()
 
+    if utm:
+        print("Test running up to", mv, "seconds.")
+    else:
+        print("Test running up to", mv, "inputs.")
+
     print(Fore.GREEN + "\nPress any key to start...\n")
 
-    _ = readkey()   # Wait for uset input to start
+
+    _ = readkey()   # Wait for user input to start
+
 
     # Initialize variables
     test_start = time()
@@ -79,6 +86,7 @@ def main():
         duration = time() - request_time
         type_average_duration += duration
 
+
         # Validate input
         if received == requested:
             number_of_hits += 1
@@ -88,6 +96,7 @@ def main():
         else:
             type_miss_average_duration += duration
             print("You pressed:", Fore.RED + received)
+
 
         # Save input in list
         inputs.append(Input(requested, received, duration))
@@ -106,12 +115,12 @@ def main():
     # Statistics
     test_end = time()
     test_duration = test_end - test_start
+    accuracy = 0
 
-    accuracy = number_of_hits / number_of_types
 
-
-    # Calculate average durations
+    # Calculate accuracy and average durations
     if number_of_types != 0:
+        accuracy = number_of_hits / number_of_types
         type_average_duration /= number_of_types
 
     if number_of_hits != 0:
