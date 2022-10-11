@@ -157,13 +157,13 @@ def main():
     # type_hit_average_duration: sum the durations of all the successful inputs and divide by the total number of successful
     # inputs
     # If there were no successful inputs, the same logic as before is applied
-     type_hit_average_duration = sum([input.duration for input in inputs if input.requested==input.received]) \
+    type_hit_average_duration = sum([input.duration for input in inputs if input.requested==input.received]) \
         / (1 if number_of_hits==0 else number_of_hits)
     
     # type_miss_average_duration: sum the durations of all the unsuccessful inputs and divide by the total number of 
     # unsuccessful inputs
     # If there were no unsuccessful inputs, the same logic as before is applied
-   type_miss_average_duration = sum([input.duration for input in inputs if input.requested!=input.received]) \
+    type_miss_average_duration = sum([input.duration for input in inputs if input.requested!=input.received]) \
         / (1 if number_of_misses==0 else number_of_misses)
 
     statistics = {'inputs': inputs,
