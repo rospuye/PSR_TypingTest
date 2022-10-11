@@ -14,6 +14,25 @@ from pprint import pprint
 init(autoreset=True)        # auto reset colorama colors
 
 
+def checkPositive(value):
+    """
+    Check if input value is a positive integer
+    """
+
+    # Check if value is an integer or can be converted to one
+    try:
+        value = int(value)
+
+    except ValueError:
+        raise argparse.ArgumentTypeError("invalid int value: '%s'" % value)
+
+    # Check if int value is positive (non-ints caught by exeption above)
+    if value <= 0:
+        raise argparse.ArgumentTypeError("invalid positive int value: %s" % value)
+
+    return value
+
+
 def args():
     """
     Manage command line arguments
@@ -22,18 +41,31 @@ def args():
         use_time_mode: bool, defines ending condition
         max_value: int, if use_time_mode = True, represents number of seconds
                         if use_time_mode = False, represents number of inputs
-
     """
 
     parser = argparse.ArgumentParser(description='PSR Typing Test')
     parser.add_argument('-utm', '--use_time_mode', action='store_true', help='Use this argument to play in time mode')
-    parser.add_argument('-mv', '--max_value', type=int, required=True, help='Maximum number of inputs / Time mode: maximum number of seconds.')
+    parser.add_argument('-mv', '--max_value', type=checkPositive, required=True, help='Maximum number of inputs / Time mode: maximum number of seconds.')
 
     args = vars(parser.parse_args())
     max_value = args["max_value"]
     use_time_mode = args["use_time_mode"]
 
     return use_time_mode, max_value
+
+
+def validCharacter(input):
+    """
+    Check if input is str from "a" to "z" or SPACE
+    """
+
+    try:    # this fails if input str is longer than one character
+        if (97 <= ord(input) <= 122) or (input == key.SPACE):
+            return True
+        return False
+
+    except ValueError:
+        return False
 
 
 def main():
@@ -72,11 +104,16 @@ def main():
         request_time = time()
 
 
-        # Wait for user input
-        received = readkey()
+        # Keep reading user inputs until one is valid
+        while True:
+
+            received = readkey().lower()    # read input and convert to lowercase
+
+            if validCharacter(received):
+                break
 
 
-        # Break if the key is SPACE - don't include this input in statistics
+        # Break here if the key is SPACE - exclude this input from statistics
         if received == key.SPACE:
             print(Fore.RED + "\nInterrupted by user\n")
             break
@@ -104,11 +141,11 @@ def main():
 
         # Stop conditions
         if utm and (time() - test_start > mv):
-            print(Fore.RED + "\nCurrent test duration (" + str(time() - test_start) + ") exceeds maximum of " + str(mv) + " seconds.\n")
+            print(Fore.CYAN + "\nCurrent test duration (" + str(time() - test_start) + ") exceeds maximum of " + str(mv) + " seconds.\n")
             break
 
         elif not utm and (number_of_types >= mv):
-            print(Fore.RED + "\nCurrent number of types (" + str(number_of_types) + ") has reached its maximum value.\n")
+            print(Fore.CYAN + "\nCurrent number of types (" + str(number_of_types) + ") has reached its maximum value.\n")
             break
 
 
