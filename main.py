@@ -24,9 +24,9 @@ def checkPositive(value):
         value = int(value)
 
     except ValueError:
-        raise argparse.ArgumentTypeError("invalid int value: '%s'" % value)
+        raise argparse.ArgumentTypeError("invalid non-int value: '%s'" % value)
 
-    # Check if int value is positive (non-ints caught by exeption above)
+    # Check if int value is positive (non-ints caught by exception above)
     if value <= 0:
         raise argparse.ArgumentTypeError("invalid positive int value: %s" % value)
 
@@ -89,10 +89,6 @@ def main():
     number_of_hits = 0
     Input = namedtuple('Input', ['requested', 'received', 'duration'])
     inputs = []
-    type_average_duration = 0
-    type_hit_average_duration = 0
-    type_miss_average_duration = 0
-
 
     while True:
 
@@ -121,17 +117,13 @@ def main():
         number_of_types += 1
 
         duration = time() - request_time
-        type_average_duration += duration
-
 
         # Validate input
         if received == requested:
             number_of_hits += 1
-            type_hit_average_duration += duration
             print("You pressed:", Fore.GREEN + received)
 
         else:
-            type_miss_average_duration += duration
             print("You pressed:", Fore.RED + received)
 
 
@@ -154,18 +146,26 @@ def main():
     test_duration = test_end - test_start
     accuracy = 0
 
+    number_of_misses = number_of_types - number_of_hits
+    accuracy = number_of_hits / number_of_types
 
-    # Calculate accuracy and average durations
-    if number_of_types != 0:
-        accuracy = number_of_hits / number_of_types
-        type_average_duration /= number_of_types
-
-    if number_of_hits != 0:
-        type_hit_average_duration /= number_of_hits
-
-    if number_of_types - number_of_hits != 0:
-        type_miss_average_duration /= (number_of_types - number_of_hits)
-
+    # type_average_duration: sum the durations of all the inputs and divide by the total number of inputs
+    # If there were no inputs, that means the sum of all durations is 0 and, thus, the average duration is 0,
+    # so we divide by 1
+    type_average_duration = sum([input[2] for input in inputs]) \
+        / (1 if number_of_types==0 else number_of_types)
+    
+    # type_hit_average_duration: sum the durations of all the successful inputs and divide by the total number of successful
+    # inputs
+    # If there were no successful inputs, the same logic as before is applied
+    type_hit_average_duration = sum([input[2] for input in inputs if input[0]==input[1]]) \
+        / (1 if number_of_hits==0 else number_of_hits)
+    
+    # type_miss_average_duration: sum the durations of all the unsuccessful inputs and divide by the total number of 
+    # unsuccessful inputs
+    # If there were no unsuccessful inputs, the same logic as before is applied
+    type_miss_average_duration = sum([input[2] for input in inputs if input[0]!=input[1]]) \
+        / (1 if number_of_misses==0 else number_of_misses)
 
     statistics = {'inputs': inputs,
                     'accuracy': accuracy,
