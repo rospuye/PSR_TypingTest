@@ -144,27 +144,26 @@ def main():
     # Statistics
     test_end = time()
     test_duration = test_end - test_start
-    accuracy = 0
 
     number_of_misses = number_of_types - number_of_hits
-    accuracy = number_of_hits / number_of_types
+    accuracy = number_of_hits / number_of_types if number_of_types!=0 else 0
 
     # type_average_duration: sum the durations of all the inputs and divide by the total number of inputs
     # If there were no inputs, that means the sum of all durations is 0 and, thus, the average duration is 0,
     # so we divide by 1
-    type_average_duration = sum([input[2] for input in inputs]) \
+    type_average_duration = sum([input.duration for input in inputs]) \
         / (1 if number_of_types==0 else number_of_types)
     
     # type_hit_average_duration: sum the durations of all the successful inputs and divide by the total number of successful
     # inputs
     # If there were no successful inputs, the same logic as before is applied
-    type_hit_average_duration = sum([input[2] for input in inputs if input[0]==input[1]]) \
+     type_hit_average_duration = sum([input.duration for input in inputs if input.requested==input.received]) \
         / (1 if number_of_hits==0 else number_of_hits)
     
     # type_miss_average_duration: sum the durations of all the unsuccessful inputs and divide by the total number of 
     # unsuccessful inputs
     # If there were no unsuccessful inputs, the same logic as before is applied
-    type_miss_average_duration = sum([input[2] for input in inputs if input[0]!=input[1]]) \
+   type_miss_average_duration = sum([input.duration for input in inputs if input.requested!=input.received]) \
         / (1 if number_of_misses==0 else number_of_misses)
 
     statistics = {'inputs': inputs,
